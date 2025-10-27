@@ -1,0 +1,7 @@
+google-cloud-bigquery
+google-auth
+pandas
+db-dtypes
+graphviz
+pm4py
+pyvis

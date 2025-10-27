@@ -1,22 +1,93 @@
-### AL ###
-#Template for AL projects for Dynamics 365 Business Central
-#launch.json folder
+# ============================================
+# 보안 관련 파일 (절대 공개하면 안 됨)
+# ============================================
+key.json
+*.key
+*.pem
+*.p12
+credentials.json
+service-account*.json
+
+# ============================================
+# Python 가상환경
+# ============================================
+cap/
+venv/
+env/
+ENV/
+.venv/
+virtualenv/
+
+# ============================================
+# Python 캐시 및 컴파일 파일
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ============================================
+# 생성된 결과 파일 (재생성 가능)
+# ============================================
+transition_graph_out.html
+transition_graph_reach.html
+*.html
+!lib/**/*.html
+
+# ============================================
+# IDE 및 에디터 설정
+# ============================================
 .vscode/
-#Cache folder
-.alcache/
-#Symbols folder
-.alpackages/
-#Snapshots folder
-.snapshots/
-#Testing Output folder
-.output/
-#Extension App-file
-*.app
-#Rapid Application Development File
-rad.json
-#Translation Base-file
-*.g.xlf
-#License-file
-*.flf
-#Test results file
-TestResults.xml
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# Jupyter Notebook
+# ============================================
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ============================================
+# 로그 및 임시 파일
+# ============================================
+*.log
+*.tmp
+*.temp
+.cache/
+
+# ============================================
+# 데이터 파일 (선택적 - 필요시 주석 해제)
+# ============================================
+# *.csv
+# *.parquet
+# *.pkl
+# *.pickle
+# data/
+# datasets/
+
+# ============================================
+# 테스트 관련
+# ============================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# ============================================
+# 환경 변수 파일
+# ============================================
+.env
+.env.local
+.env.*.local
+
