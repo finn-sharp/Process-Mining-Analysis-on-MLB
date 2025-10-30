@@ -7,34 +7,33 @@ import pandas as pd
 from datetime import timedelta
 
 
-def prepare_timestamps(df_event, exclude_pitch_types=None):
+def prepare_timestamps(df_event):
     """
     각 타석의 투구에 timestamp 부여 (In 노드 없이)
     
     Args:
         df_event: 필터링된 DataFrame
-        exclude_pitch_types: 제외할 투구 타입 리스트 (기본값: ['FF'])
     
     Returns:
         DataFrame: timestamp가 추가된 DataFrame
     """
-    if exclude_pitch_types is None:
-        exclude_pitch_types = ['FF']  # FF 투구 타입 기본 제외
+
+    # 1️⃣ pitch_type이 'nan'(문자열) 또는 None인 행 제거
+    df_event = df_event[
+        ~df_event['pitch_type'].astype(str).str.lower().isin(['nan', 'none', '', 'null'])
+    ].copy()
     
-    # 제외할 투구 타입 필터링 (처음부터 필터링)
-    if exclude_pitch_types:
-        df_event = df_event[~df_event['pitch_type'].isin(exclude_pitch_types)].copy()
-    
-    # 각 케이스별로 정렬
+    # 2️⃣ 각 케이스별로 정렬
     df_event = df_event.sort_values(by=['case_id', 'pitch_order']).reset_index(drop=True)
     
-    # timestamp 생성
+    # 3️⃣ timestamp 생성
     df_event['time:timestamp'] = df_event.apply(
         lambda row: row['game_date'] + timedelta(seconds=row['pitch_order']),
         axis=1
     )
     
     return df_event
+
 
 
 def add_start_node(df_event):
@@ -125,9 +124,15 @@ def clean_dataframe(df_event):
         DataFrame: 정리된 DataFrame
     """
     # pm4py 포맷으로 컬럼 이름 맞추기
+   # 1. description 그룹화
+    df_event = map_description_to_category(df_event)
+
+    # 2. pitch_type + description_group 조합으로 concept:name 생성
+    df_event['concept:name'] = df_event['pitch_type'].astype(str) + " - " + df_event['description_group']
+
+    # 3. pm4py용 컬럼 이름 통일
     df_clean = df_event.rename(columns={
-        'case_id': 'case:concept:name',
-        'pitch_type': 'concept:name'
+        'case_id': 'case:concept:name'
     })
     
     # 필요한 컬럼만 선택
@@ -142,5 +147,53 @@ def clean_dataframe(df_event):
     
     return df_clean
 
+def map_description_to_category(df):
+    """description을 5개 범주로 그룹화"""
+    mapping = {
+        'hit_into_play': '공을 침',
+        'ball': '볼',
+        'blocked_ball': '볼',
+        'called_strike': '스트라이크',
+        'swinging_strike': '스트라이크',
+        'swinging_strike_blocked': '스트라이크',
+        'foul_tip': '스트라이크',
+        'foul_bunt': '스트라이크',
+        'missed_bunt': '스트라이크',
+        'foul': '파울',
+        'hit_by_pitch': '데드볼'
+    }
+    df['description_group'] = df['description'].map(mapping).fillna('result')
+    return df
 
 
+## 훈성 타석 순서 첨가
+def add_end_node(df_event):
+    """
+    각 타석(case_id)의 마지막 pitch 이벤트를 프로세스 종료 이벤트로 추가
+    (예: single, strikeout, walk 등)
+    """
+    df_with_end = df_event.copy()
+
+    end_rows = []
+    for case_id, case_df in df_with_end.groupby('case_id'):
+        case_df = case_df.sort_values(by='pitch_order')
+        # 마지막 pitch
+        last_row = case_df.iloc[-1].copy()
+        if pd.notna(last_row.get('events')) and last_row['events'] not in [None, '', 'None', 'nan']:
+            # 새로운 "종료 노드" 생성
+            end_row = last_row.copy()
+            end_row['pitch_type'] = str(last_row['events']).capitalize()  # e.g. 'Single', 'Strikeout'
+            end_row['description'] = 'Result'
+            end_row['pitch_order'] = last_row['pitch_order'] + 1
+            # timestamp는 마지막 pitch보다 +1초
+            if 'time:timestamp' in end_row:
+                end_row['time:timestamp'] = end_row['time:timestamp'] + timedelta(seconds=1)
+            end_rows.append(end_row)
+    
+    # 종료 노드 추가
+    if end_rows:
+        end_df = pd.DataFrame(end_rows)
+        df_with_end = pd.concat([df_with_end, end_df], ignore_index=True)
+        df_with_end = df_with_end.sort_values(by=['case_id', 'pitch_order']).reset_index(drop=True)
+    
+    return df_with_end
