@@ -21,18 +21,18 @@ def define_at_bat_cases(df):
     df_event = df.copy()
     
     # [1. 정렬] - game_date + batter별로 정렬 (이미 순서대로 되어있지만 확실히)
-    df_event = df_event.sort_values(by=['game_date', 'batter']).reset_index(drop=True)
+
+    df_event = df_event.reset_index()
     
     # [2. 데이터 포인터 생성] - case_id 생성: 같은 게임의 같은 타자 = 하나의 케이스
-    df_event['case_id'] = (
-        df_event['game_date'].astype(str) + "_" + 
-        df_event['batter'].astype(str)
-    )
+    df_event['case_id'] = (df_event['game_date'].astype(str) + "_" + df_event['batter'].astype(str))
+    df_event = df_event.sort_values(by=['case_id','index']).reset_index(drop=True)
     
     # [3. 투구 순서 부여] - 케이스별로 정렬 + 투구 순서 부여 (데이터 순서대로)
-    df_event = df_event.sort_values(by=['case_id']).reset_index(drop=True)
     df_event['pitch_order'] = df_event.groupby('case_id').cumcount()
-    
+    df_event = df_event.sort_values(by=['case_id']).reset_index(drop=True)
+    del df_event['index']
+
     return df_event
 
 
