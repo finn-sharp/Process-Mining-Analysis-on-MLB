@@ -1,10 +1,10 @@
 from pitch_analysis_modules import (
     load_data_from_bigquery,
     define_at_bat_cases,
-    filter_cases,
-    add_start_node,
-    clean_dataframe,
-    create_event_log,
+    one_way_filter,
+    addNodeAndPreprocess,
+    prepareEventLog,
+    createEventLogFromDataFrame,
     create_process_model,
     calculate_transition_probabilities,
     visualize_transition_graph_pyvis,
@@ -37,31 +37,36 @@ def example_step_by_step():
     df = load_data_from_bigquery(key_path="key.json", limit=1000)
     print(f"   로드된 데이터: {len(df)}행")
     
-    # 2. 타석 케이스 정의
-    print("\n2. 타석 케이스 정의 중...")
+    # 2. 프로세스 라벨링
+    print("\n2. 프로세스 별 라벨링 작업 중...")
     df_event = define_at_bat_cases(df)
-    print(f"   총 타석 수: {df_event['case_id'].nunique()}")
+    print(f"   총 타석 수: {df_event['processID'].nunique()}")
     
-    # 3. 아웃 케이스 필터링
-    print("\n3. 아웃 케이스 필터링 중...")
-
-    df_filtered, result_counts = filter_cases(df_event, 'out')
-    print(f"   아웃 케이스: {len(df_filtered['case_id'].unique())}개")
+    # 3. 데이터 필터링
+    print("\n3. 사용자 정의 필터 작업 중...")
+    filter = {}
+    filter['colName'] = 'events'
+    filter['posCondition'] = ['strikeout']
+    
+    df_filtered, result_counts = one_way_filter(df_event, **filter)
+    print(f"   케이스: {len(df_filtered['case_id'].unique())}개")
     print(f"   결과 분포:\n{result_counts}")
     
-    # 4. 시작 노드 추가
-    print("\n4. 시작 노드 추가 중...")
-    df_with_start = add_start_node(df_filtered)
-    print(f"   'In' 노드 추가 완료")
+    # 4. 노드 추가 및 pm4py 필수 컬럼 생성
+    start_name = 'In'
+    end_name = 'Out'
+    print("\n4. 시작 및 종료 노드 추가 및 pm4py 필수 컬럼 생성 중...")
+    df_with_start = addNodeAndPreprocess(df_filtered, start_name, end_name)
+    print(f"   시작 및 종료 노드 추가 및 pm4py 필수 컬럼 생성 완료")
     
-    # 5. 데이터 정리
-    print("\n5. 데이터 정리 중...")
-    df_clean = clean_dataframe(df_with_start)
-    print(f"   정리 후 데이터: {len(df_clean)}행")
+    # 5. pm4py 포멧 변경
+    print("\n5. pm4py 포멧 변경 중...")
+    df_clean = prepareEventLog(df_with_start)
+    print(f"   변경 후 pm4py 포멧: {len(df_clean)}행")
     
     # 6. 이벤트 로그 생성
     print("\n6. 이벤트 로그 생성 중...")
-    event_log = create_event_log(df_clean)
+    event_log = createEventLogFromDataFrame(df_clean)
     print(f"   이벤트 로그 케이스 수: {len(event_log)}")
     
     # 7. 프로세스 모델 생성
@@ -102,16 +107,22 @@ def example_custom_analysis():
     df_event = define_at_bat_cases(df)
     
     # 아웃 케이스만 필터링
-    df_filtered, _ = filter_cases(df_event, 'out')
+    filter = {}
+    filter['colName'] = 'events'
+    filter['posCondition'] = ['strikeout']
+    
+    df_filtered, _ = one_way_filter(df_event, **filter)    
     
     # 시작 노드 추가
-    df_with_start = add_start_node(df_filtered)
+    start_name = 'In'
+    end_name = 'Out'
+    df_with_start = addNodeAndPreprocess(df_filtered, start_name, end_name)
     
     # 데이터 정리
-    df_clean = clean_dataframe(df_with_start)
+    df_clean = prepareEventLog(df_with_start)
     
     # 이벤트 로그 생성
-    event_log = create_event_log(df_clean)
+    event_log = createEventLogFromDataFrame(df_clean)
     
     # 전이 확률만 계산 (시각화 없이)
     transition_probs, transition_counts = calculate_transition_probabilities(event_log)
@@ -131,20 +142,30 @@ def example_custom_analysis():
 
 if __name__ == "__main__":
     # 원하는 방법 선택해서 실행
-    print("=== 아웃 케이스 분석 ===")
+    filter_out = {}
+    filter_out['colName'] = 'events'
+    filter_out['posCondition'] = ['strikeout']
+
+    print("=== One-Way Filted Case Process Mining ===")
     results_out = analyze_pitching_patterns(
         key_path="key.json",
         limit=None,  # 전체 데이터 사용
         min_prob=0.05,
-        case_type='out'
-    )
+        case_type='out',
+        filter=filter_out
+        )
     
+    filter_reach = {}
+    filter_reach['colName'] = 'events'
+    filter_reach['posCondition'] = ['walk', 'single', 'double', 'triple', 'home_run']
+
     print("\n=== 출루 케이스 분석 ===")
     results_reach = analyze_pitching_patterns(
         key_path="key.json",
         limit=None,  # 전체 데이터 사용
         min_prob=0.05,
-        case_type='reach'
+        case_type='reach',
+        filter=filter_reach
     )
     
     # 전이 확률 비교 및 Loss 계산
@@ -156,11 +177,11 @@ if __name__ == "__main__":
         results_reach['transition_counts']
     )
     
-    print_comparison_summary(
-        comparison,
-        num_out_cases=results_out['num_cases'],
-        num_reach_cases=results_reach['num_cases']
-    )
+    # print_comparison_summary(
+    #     comparison,
+    #     num_out_cases=results_out['num_cases'],
+    #     num_reach_cases=results_reach['num_cases']
+    # )
     
     # 또는
     # print("=== 단계별 실행 ===")
