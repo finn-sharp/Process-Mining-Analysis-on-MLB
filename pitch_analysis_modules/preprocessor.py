@@ -7,82 +7,75 @@ import pandas as pd
 from datetime import timedelta
 
 
-def prepare_timestamps(df_event):
+def deleteNullPitchType(df_event):
     """
-    각 타석의 투구에 timestamp 부여 (In 노드 없이)
-    
-    Args:
-        df_event: 필터링된 DataFrame
-    
-    Returns:
-        DataFrame: timestamp가 추가된 DataFrame
+    pitch_type이 'nan'(문자열) 또는 None인 행 제거
     """
-
-    # 1️⃣ pitch_type이 'nan'(문자열) 또는 None인 행 제거
-    df_event = df_event[
-        ~df_event['pitch_type'].astype(str).str.lower().isin(['nan', 'none', '', 'null'])
-    ].copy()
+    p_index = set(df_event[df_event['pitch_type'].isna()]['processID'])
+    condition = ~df_event['processID'].isin(p_index)
     
-    # 2️⃣ 각 케이스별로 정렬
-    df_event = df_event.sort_values(by=['case_id', 'pitch_order']).reset_index(drop=True)
-    
-    # 3️⃣ timestamp 생성
-    df_event['time:timestamp'] = df_event.apply(
-        lambda row: row['game_date'] + timedelta(seconds=row['pitch_order']),
-        axis=1
-    )
-    
+    df_event = df_event[condition]
+    df_event = df_event.sort_values(by=['processID'], ascending=True).reset_index(drop=True)
     return df_event
 
+def checkNullPitchType(df_event):
+    """
+    pitch_type이 'nan'(문자열) 또는 None인 행 확인
+    """
+    p_index = set(df_event[df_event['pitch_type'].isna()]['processID'])
+    df_check_null = df_event[df_event['processID'].isin(p_index)]
+
+    return df_check_null
 
 
-def add_start_node(df_event):
-    """
-    각 타석의 시작에 "In" 노드 추가
-    
-    Args:
-        df_event: 필터링된 DataFrame
-    
-    Returns:
-        DataFrame: "In" 노드가 추가된 DataFrame
-    """
-    df_with_start = df_event.copy()
-    
-    # 각 케이스별로 정렬
-    df_with_start = df_with_start.sort_values(by=['case_id', 'pitch_order']).reset_index(drop=True)
-    
-    # time:timestamp가 없으면 먼저 생성
-    if 'time:timestamp' not in df_with_start.columns:
-        df_with_start = prepare_timestamps(df_with_start)
-    
-    # 각 케이스의 시작에 "In" 노드 추가
-    start_rows = []
-    for case_id in df_with_start['case_id'].unique():
-        case_df = df_with_start[df_with_start['case_id'] == case_id]
+
+
+# 시작 노드 끝 노드 설정하는 걸로 변경하기 (Labeling으로 도식화)
+def addNodeAndTimestamp(df_event, start_name, end_name):
+ 
+    # [1] 행 제거(PitchType is Null)
+    acept_data = deleteNullPitchType(df_event)
+
+    # [2] Time Stamp 추가
+    acept_data['time:timestamp'] = acept_data.apply(lambda row: row['game_date'] + timedelta(seconds=row['pitchOrder']),axis=1)
+
+    # [3] 시작/종료 노드 추가
+    start_name = start_name
+    end_name = end_name
+
+
+    add_node_list = []
+    for process in acept_data['processID'].unique():
+        case_df = acept_data[acept_data['processID'] == process]
         if len(case_df) > 0:
             # 첫 번째 행을 복사하여 "In" 노드 생성
-            first_row = case_df.iloc[0].copy()
-            first_row['pitch_type'] = 'In'
-            first_row['pitch_order'] = -1  # 시작 노드는 -1로 설정
-            # 첫 번째 투구보다 1초 전 시간 설정
-            if 'time:timestamp' in first_row and pd.notna(first_row['time:timestamp']):
-                first_row['time:timestamp'] = first_row['time:timestamp'] - timedelta(seconds=1)
-            elif 'game_date' in first_row:
-                first_row['time:timestamp'] = first_row['game_date'] - timedelta(seconds=1)
-            start_rows.append(first_row)
-    
-    # 시작 노드 DataFrame 생성
-    if start_rows:
-        start_df = pd.DataFrame(start_rows)
-        # 원본 데이터와 합치기
-        df_with_start = pd.concat([start_df, df_with_start], ignore_index=True)
-        # 케이스와 순서로 정렬
-        df_with_start = df_with_start.sort_values(by=['case_id', 'pitch_order']).reset_index(drop=True)
-    
-    return df_with_start
+            first_row = case_df.iloc[-1].copy()
+            first_row['pitch_type'] = start_name
+            first_row['pitchOrder'] = -1  # 시작 노드는 -1로 설정
+            first_row['time:timestamp'] = first_row['time:timestamp'] - timedelta(seconds=1)
+        
+            last_row = case_df.iloc[0].copy()
+            last_row['pitch_type'] = end_name
+            last_row['pitchOrder'] = len(case_df)
+            last_row['time:timestamp'] = last_row['time:timestamp'] + timedelta(seconds=1)
+            
+            add_node_list.extend([first_row, last_row])
+
+    # [4] 결과 저장
+    node_df = pd.DataFrame(add_node_list)
+    acept_data = pd.concat([acept_data, node_df], ignore_index=True)
+    acept_data = acept_data.sort_values(by=['processID', 'pitchOrder'], ascending=[True, False]).reset_index(drop=True)
+
+    return acept_data
 
 
-def attach_case_result_to_pitch_type(df_event):
+#######
+#######
+#######
+####### pm4py에서 제공하는 패턴으로 변경해야할 부분
+#######
+#######
+def attach_case_result_to_pitch_type(df_event): 
     """
     각 투구의 pitch_type에 해당 타석의 최종 결과(out / reach / other)를 붙임
     예: SL → SL_out, SI → SI_reach
@@ -165,35 +158,3 @@ def map_description_to_category(df):
     df['description_group'] = df['description'].map(mapping).fillna('result')
     return df
 
-
-## 훈성 타석 순서 첨가
-def add_end_node(df_event):
-    """
-    각 타석(case_id)의 마지막 pitch 이벤트를 프로세스 종료 이벤트로 추가
-    (예: single, strikeout, walk 등)
-    """
-    df_with_end = df_event.copy()
-
-    end_rows = []
-    for case_id, case_df in df_with_end.groupby('case_id'):
-        case_df = case_df.sort_values(by='pitch_order')
-        # 마지막 pitch
-        last_row = case_df.iloc[-1].copy()
-        if pd.notna(last_row.get('events')) and last_row['events'] not in [None, '', 'None', 'nan']:
-            # 새로운 "종료 노드" 생성
-            end_row = last_row.copy()
-            end_row['pitch_type'] = str(last_row['events']).capitalize()  # e.g. 'Single', 'Strikeout'
-            end_row['description'] = 'Result'
-            end_row['pitch_order'] = last_row['pitch_order'] + 1
-            # timestamp는 마지막 pitch보다 +1초
-            if 'time:timestamp' in end_row:
-                end_row['time:timestamp'] = end_row['time:timestamp'] + timedelta(seconds=1)
-            end_rows.append(end_row)
-    
-    # 종료 노드 추가
-    if end_rows:
-        end_df = pd.DataFrame(end_rows)
-        df_with_end = pd.concat([df_with_end, end_df], ignore_index=True)
-        df_with_end = df_with_end.sort_values(by=['case_id', 'pitch_order']).reset_index(drop=True)
-    
-    return df_with_end
