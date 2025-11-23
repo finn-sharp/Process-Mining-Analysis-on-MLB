@@ -28,8 +28,6 @@ def checkNullPitchType(df_event):
     return df_check_null
 
 
-
-
 # 시작 노드 끝 노드 설정하는 걸로 변경하기 (Labeling으로 도식화)
 def addNodeAndTimestamp(df_event, start_name, end_name):
  
@@ -69,6 +67,57 @@ def addNodeAndTimestamp(df_event, start_name, end_name):
     return acept_data
 
 
+def map_description_to_category(df):
+    """description을 5개 범주로 그룹화"""
+    mapping = {
+        'hit_into_play': '공을 침',
+        'ball': '볼',
+        'blocked_ball': '볼',
+        'called_strike': '스트라이크',
+        'swinging_strike': '스트라이크',
+        'swinging_strike_blocked': '스트라이크',
+        'foul_tip': '스트라이크',
+        'foul_bunt': '스트라이크',
+        'missed_bunt': '스트라이크',
+        'foul': '파울',
+        'hit_by_pitch': '데드볼'
+    }
+    df['description_group'] = df['description'].map(mapping).fillna('result')
+    return df
+
+def clean_dataframe(df_event):
+    """
+    DataFrame에서 None 값 완전히 제거
+    
+    Args:
+        df_event: 원본 DataFrame 
+
+    Returns:
+        DataFrame: 정리된 DataFrame
+    """
+    # pm4py 포맷으로 컬럼 이름 맞추기
+   # 1. description 그룹화
+    df_event = map_description_to_category(df_event)
+
+    # 2. pitch_type + description_group 조합으로 concept:name 생성
+    df_event['concept:name'] = df_event['pitch_type'].astype(str) + " - " + df_event['description_group']
+
+    # 3. pm4py용 컬럼 이름 통일
+    df_clean = df_event.rename(columns={'case_id': 'case:concept:name'})
+    
+    # 필요한 컬럼만 선택
+    df_clean = df_clean[['case:concept:name', 'concept:name', 'time:timestamp']].copy()
+    
+    # None, 빈 문자열, NaN 모두 제거
+    df_clean = df_clean.dropna(subset=['concept:name'])
+    df_clean = df_clean[df_clean['concept:name'].notna()]
+    df_clean = df_clean[df_clean['concept:name'] != '']
+    df_clean = df_clean[df_clean['concept:name'].astype(str) != 'nan']
+    df_clean['concept:name'] = df_clean['concept:name'].astype(str)
+    
+    return df_clean
+
+
 #######
 #######
 #######
@@ -104,57 +153,4 @@ def attach_case_result_to_pitch_type(df_event):
     df_event['pitch_type'] = df_event['pitch_type'] + '_' + df_event['case_result']
 
     return df_event
-
-
-def clean_dataframe(df_event):
-    """
-    DataFrame에서 None 값 완전히 제거
-    
-    Args:
-        df_event: 원본 DataFrame (이미 FF가 제외된 상태)
-    
-    Returns:
-        DataFrame: 정리된 DataFrame
-    """
-    # pm4py 포맷으로 컬럼 이름 맞추기
-   # 1. description 그룹화
-    df_event = map_description_to_category(df_event)
-
-    # 2. pitch_type + description_group 조합으로 concept:name 생성
-    df_event['concept:name'] = df_event['pitch_type'].astype(str) + " - " + df_event['description_group']
-
-    # 3. pm4py용 컬럼 이름 통일
-    df_clean = df_event.rename(columns={
-        'case_id': 'case:concept:name'
-    })
-    
-    # 필요한 컬럼만 선택
-    df_clean = df_clean[['case:concept:name', 'concept:name', 'time:timestamp']].copy()
-    
-    # None, 빈 문자열, NaN 모두 제거
-    df_clean = df_clean.dropna(subset=['concept:name'])
-    df_clean = df_clean[df_clean['concept:name'].notna()]
-    df_clean = df_clean[df_clean['concept:name'] != '']
-    df_clean = df_clean[df_clean['concept:name'].astype(str) != 'nan']
-    df_clean['concept:name'] = df_clean['concept:name'].astype(str)
-    
-    return df_clean
-
-def map_description_to_category(df):
-    """description을 5개 범주로 그룹화"""
-    mapping = {
-        'hit_into_play': '공을 침',
-        'ball': '볼',
-        'blocked_ball': '볼',
-        'called_strike': '스트라이크',
-        'swinging_strike': '스트라이크',
-        'swinging_strike_blocked': '스트라이크',
-        'foul_tip': '스트라이크',
-        'foul_bunt': '스트라이크',
-        'missed_bunt': '스트라이크',
-        'foul': '파울',
-        'hit_by_pitch': '데드볼'
-    }
-    df['description_group'] = df['description'].map(mapping).fillna('result')
-    return df
 

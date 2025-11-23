@@ -2,7 +2,7 @@ from pitch_analysis_modules import (
     load_data_from_bigquery,
     define_at_bat_cases,
     one_way_filter,
-    add_start_node,
+    addNodeAndTimestamp,
     clean_dataframe,
     create_event_log,
     create_process_model,
@@ -52,10 +52,12 @@ def example_step_by_step():
     print(f"   케이스: {len(df_filtered['case_id'].unique())}개")
     print(f"   결과 분포:\n{result_counts}")
     
-    # 4. 시작 노드 추가
-    print("\n4. 시작 노드 추가 중...")
-    df_with_start = add_start_node(df_filtered)
-    print(f"   'In' 노드 추가 완료")
+    # 4. 시작 및 종료 노드 추가
+    start_name = 'In'
+    end_name = 'Out'
+    print("\n4. 시작 및 종료 노드 추가 중...")
+    df_with_start = addNodeAndTimestamp(df_filtered, start_name, end_name)
+    print(f"   시작 및 종료 노드 추가 완료")
     
     # 5. 데이터 정리
     print("\n5. 데이터 정리 중...")
@@ -112,7 +114,9 @@ def example_custom_analysis():
     df_filtered, _ = one_way_filter(df_event, **filter)    
     
     # 시작 노드 추가
-    df_with_start = add_start_node(df_filtered)
+    start_name = 'In'
+    end_name = 'Out'
+    df_with_start = addNodeAndTimestamp(df_filtered, start_name, end_name)
     
     # 데이터 정리
     df_clean = clean_dataframe(df_with_start)
