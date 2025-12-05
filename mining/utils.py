@@ -1,11 +1,19 @@
-"""
-데이터 로드 모듈
-BigQuery에서 투구 데이터를 로드하는 함수
-"""
-
 import pandas as pd
 from google.cloud import bigquery
 from google.oauth2 import service_account
+import re
+
+def extract_stage_number(state):
+    """상태(state) 문자열에서 단계 번호를 추출합니다."""
+    if state == 'start': 
+        return -1 
+    if state == 'end': 
+        return 999 
+    match = re.search(r'\_(\d+)', state)
+    if match: 
+        return int(match.group(1))
+    return 0
+
 
 
 def load_data_from_bigquery(key_path="key.json", limit=None):
