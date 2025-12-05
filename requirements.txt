@@ -6,3 +6,5 @@ graphviz
 pm4py
 pyvis
 networkx
+seaborn
+matplotlib
