@@ -1,11 +1,11 @@
-## MLB 투수 구종 패턴 분석 프로젝트 요약
+# MLB 투수 구종 패턴 분석 프로젝트 요약
 
-### **1. 연구 개요 및 목표**
+## **1. 연구 개요 및 목표**
 
 - **주제:** Levenshtein 거리를 이용한 MLB 투수의 구종 시퀀스 패턴 분석 및 계층적 군집화.
 - **목표:** 프로세스 마이닝 기법을 활용하여 투수의 구종 선택 전략을 **구조적으로 정량화**하고, 유사한 전략 패턴을 **군집화**하여 핵심 전략과 예외 전략을 식별합니다.
 
-### **2. 프로젝트 참여자 (Contributors)**
+## **2. 프로젝트 참여자 (Contributors)**
 
 | **사진 이름 (Photo Filename)** | **역할 (Role)** | **담당자 (Name)** |
 | --- | --- | --- |
@@ -15,11 +15,11 @@
 
 ---
 
-## 프로젝트 초기 설정 및 환경 세팅 가이드
+### 프로젝트 초기 설정 및 환경 세팅 가이드
 
 이 프로젝트는 **프로세스 마이닝(Process Mining)** 분석을 위해 특정 Python 패키지와 모듈 구조를 필요로 합니다. 아래 가이드를 따라 환경을 설정하면 즉시 실험을 시작할 수 있습니다.
 
-### **3. 프로젝트 디렉토리 구조 (Tree Structure)**
+## **3. 프로젝트 디렉토리 구조 (Tree Structure)**
 
 프로젝트의 논리적 구성 요소를 명확히 파악할 수 있도록 트리 형태로 디렉토리 구조를 시각화했습니다.
 
@@ -45,27 +45,33 @@
 └── inference.ipynb           # [5] 메인 실험 및 분석 노트북
 ```
 
-### **4. 초기 환경 설정 (Quick Start)**
+## **4. 초기 환경 설정 (Quick Start)**
 
 ### **4.1. 가상 환경 설정 및 활성화**
 
 프로젝트의 의존성 충돌을 방지하기 위해 가상 환경을 사용합니다.
 
-# 1. 프로젝트 루트 디렉토리로 이동합니다. (Process-Mining-Analysis-on-MLB)
+**4.1.1 프로젝트 루트 디렉토리로 이동합니다. (Process-Mining-Analysis-on-MLB)**
 ```Bash
 cd Process-Mining-Analysis-on-MLB
 ```
 
-# 2. 가상 환경 생성 (예: 'venv'라는 이름으로 생성)
-`python3 -m venv venv` 
+**4.1.2. 가상 환경 생성 (예: 'venv'라는 이름으로 생성)**
+```Bash
+python3 -m venv venv
+```
 
-# 3. 가상 환경 활성화
-# macOS/Linux
-`source venv/bin/activate` 
+**4.1.3. 가상 환경 활성화**
+- **macOS/Linux**
+```Bash
+source venv/bin/activate
+```
 
-# Windows (PowerShell)
+- **Windows (PowerShell)**
 
-`.\venv\Scripts\Activate`
+```Bash
+.\venv\Scripts\Activate
+```
 
 ### **4.2. 의존성 패키지 설치**
 
