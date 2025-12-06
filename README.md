@@ -37,6 +37,7 @@
 │   ├── utils.py              # - load_data_from_bigquery 등 유틸리티 함수
 │   ├── preprocessing.py      # - 전처리, 필터링, 노드 추가 함수
 │   ├── probability.py        # - BasedTraces 등 확률 기반 계산 모듈
+│   ├── visualizer.py         # - Sankey Diagram, Interactive Grpah 시각화 기능
 │   └── exploratory.py        # - ProcessEDA 등 탐색적 분석 모듈
 ├── .git/
 ├── .gitignore                # Git 추적 제외 파일 명시 (key.json, cap 등)
