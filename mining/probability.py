@@ -23,12 +23,12 @@ def prepare_eventLog(df_clean):
     # 필요한 컬럼만 선택
     df_clean = df_clean[['case:concept:name', 'concept:name', 'time:timestamp']].copy()
     
-    # None, 빈 문자열, NaN 모두 제거
-    df_clean = df_clean.dropna(subset=['concept:name'])
-    df_clean = df_clean[df_clean['concept:name'].notna()]
-    df_clean = df_clean[df_clean['concept:name'] != '']
-    df_clean = df_clean[df_clean['concept:name'].astype(str) != 'nan']
-    df_clean['concept:name'] = df_clean['concept:name'].astype(str)
+    # # None, 빈 문자열, NaN 모두 제거
+    # df_clean = df_clean.dropna(subset=['concept:name'])
+    # df_clean = df_clean[df_clean['concept:name'].notna()]
+    # df_clean = df_clean[df_clean['concept:name'] != '']
+    # df_clean = df_clean[df_clean['concept:name'].astype(str) != 'nan']
+    # df_clean['concept:name'] = df_clean['concept:name'].astype(str)
     
     return df_clean
 
@@ -105,14 +105,11 @@ class BasedTraces:
         return eventlog_df
 
     def grouped_preprocessing(self):
-        case_lengths = self.dataframe.groupby('processID').size().reset_index(name='case_length')
-        merged_df = pd.merge(left=self.dataframe, 
-                            right=case_lengths, 
-                            how='outer', 
-                            on='processID')
+        
+        grouped_df = self.dataframe.copy()
 
         grouped_preprocessed_data = []
-        for i, df in merged_df.groupby('case_length'):
+        for i, df in grouped_df.groupby('case_lengths'):
             prepared_df = prepare_eventLog(df)
             eventlog_df = create_eventlog_from_dataFrame(prepared_df)                    
             grouped_preprocessed_data.append((f"length_{i}", eventlog_df))
@@ -127,7 +124,6 @@ class BasedTraces:
         
         for activities, traces in variants_dict.items():
             activity_length = len(activities) - 2
-        
             raw_data['all'].append((activities, len(traces), activity_length))
             raw_data[f'length_{activity_length}'].append((activities, len(traces)))
             

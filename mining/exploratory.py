@@ -33,7 +33,7 @@ class ProcessEDA:
             """
             전체 케이스를 대상으로 가장 빈번한/드문 활동 및 길이를 분석합니다. (계산 결과를 출력)
             """
-            variants_count = self.data.get('all', [])
+            variants_count = self.data.get('all', {})
             if not variants_count:
                 print("Error: 'all' variant count data not available.")
                 return
@@ -43,8 +43,7 @@ class ProcessEDA:
 
             print(f"Top 1 Frequency Variant : {' → '.join(variants_count_by_freq[-1][0])}, 빈도: {variants_count_by_freq[-1][1]}회, 길이: {variants_count_by_freq[-1][2]}")
             print(f"Minimum Frequency Variant : {' → '.join(variants_count_by_freq[0][0])}, 빈도: {variants_count_by_freq[0][1]}회, 길이: {variants_count_by_freq[0][2]}")
-            
-            print("---")
+            print("-"*50)
             print(f"Maximum Length Variant : {' → '.join(variants_count_by_len[-1][0])}, 길이: {variants_count_by_len[-1][2]}, 빈도: {variants_count_by_len[-1][1]}회")
             print(f"Minimum Length Variant : {' → '.join(variants_count_by_len[0][0])}, 길이: {variants_count_by_len[0][2]}, 빈도: {variants_count_by_len[0][1]}회")
 
