@@ -30,7 +30,8 @@
 ├── clustering/               # [2] 군집 분석 모듈
 │   ├── __init__.py
 │   ├── distance.py           # - Levenshtein 거리 계산, ClusteredTraces 클래스
-│   └── visualizer.py         # - MDS, Dendrogram 시각화 기능
+│   ├── visualizer.py         # - MDS, Dendrogram 시각화 기능
+│   └── utils.py              # - 군집화 이후 cluster를 ProcessID를 기반으로 dataframe에 mapping하는 함수
 ├── lib/                      # [3] 라이브러리 및 공통 데이터 저장소 (Common Libs/Data)
 ├── mining/                   # [4] 프로세스 마이닝 분석 모듈 (Core Logic)
 │   ├── __init__.py
