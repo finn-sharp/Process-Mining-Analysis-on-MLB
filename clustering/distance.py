@@ -189,6 +189,6 @@ class ClusteredTraces:
         result['distances'] = self.matrix
         result['clusters'] = self.clusetering_agglomerative
         result['n_clusters'] = self.n_clusters
-        result['cluster_process_ids'] = self.map_process_ids_to_clusters(result['clusters'])
+        result['cluster_map'] = self.map_process_ids_to_clusters(result['clusters'])
 
         return result
