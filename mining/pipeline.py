@@ -20,16 +20,9 @@ def preprocessing_df(df, start_name='start', end_name='end', case_type=None):
 
     # case 정의
     df_grouped = define_at_bat_cases(df)
-
-    # 결측치 indexing (pitch_type)
-    missing_index = set(df_grouped[df_grouped['pitch_type'].isna()]['processID'])
-    valid_index = ~df_grouped['processID'].isin(missing_index)
-    
-    # 결측치 제거
-    df_valid = df_grouped[valid_index]
     
     # 시작, 종료 노드 추가
-    df_added = add_node_and_preprocess(df_valid, start_name, end_name, case_type=case_type)
+    df_added = add_node_and_preprocess(df_grouped, start_name, end_name, case_type=case_type)
 
     return df_added
 

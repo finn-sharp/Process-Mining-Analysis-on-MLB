@@ -14,7 +14,7 @@ def deleteNullPitchType(df_event):
     condition = ~df_event['processID'].isin(p_index)
     
     df_event = df_event[condition]
-    df_event = df_event.sort_values(by=['processID'], ascending=True).reset_index(drop=True)
+    # df_event = df_event.sort_values(by=['processID'], ascending=True).reset_index(drop=True)
     return df_event
 
 def checkNullPitchType(df_event):
@@ -88,7 +88,7 @@ def add_node_and_preprocess(df_event, start_name, end_name, case_type=None):
     acept_data = deleteNullPitchType(df_event)
     
     # [2] Description을 3개 범주로 그룹화
-    acept_data = descriptionToGroups(acept_data)
+    # acept_data = descriptionToGroups(acept_data)
 
     # [2.1] 출루 유무에 따라 concept:name을 설정할 경우
     if case_type == 'reach' or case_type == 'out':
@@ -193,13 +193,15 @@ def define_at_bat_cases(df):
     # 투구 순서 부여 + 케이스별로 정렬 + 그룹 인덱스 라벨링
     df_event = df.copy()
     df_event = df_event.reset_index()
+    
     df_event['case_id'] = (df_event['game_date'].astype(str) + "_" + df_event['batter'].astype(str))
     df_event['processID'] = assign_group_index_two_pointer(df_event)
-    df_event = df_event.sort_values(by=['case_id','index'], ascending=[True, False]).reset_index(drop=True)
-
-    # 그룹 인덱스 할당
     df_event['pitchOrder'] = df_event.groupby('processID').cumcount()
-    df_event = df_event.sort_values(by=['processID','index'], ascending=[True, True]).reset_index(drop=True)
+    df_event['case_lengths'] = df_event.groupby('processID')['events'].transform('size')
+    df_event = df_event[~(df_event['case_lengths'] < 3.0)]
+    
+    print(df_event.case_lengths.value_counts())
+
     del df_event['index']
     del df_event['case_id']
 
@@ -209,14 +211,20 @@ def define_at_bat_cases(df):
 def one_way_filter(df, colName = 'events', posCondition = ['strikeout']):
 
     # 1. 조건에 걸리는 행만 추출
-    condition = df[colName].isin(posCondition)
-    df_filtered = df[condition]
+    condition1 = df[colName].isin(posCondition)
+    df_filtered = df[condition1]
 
     # 2. 조건에 걸리는 행의 processID 추출
     processID_list = df_filtered['processID'].unique()
 
     # 3. 조건에 걸리는 행의 processID로 케이스 필터링
     df_filtered = df[df['processID'].isin(processID_list)]
+
+    # 4. 구종 Counts가 3개 이상인 정상 데이터만 추출
+    condition2 = df_filtered.pitch_type == 'end'
+    condition3 = df_filtered[condition2].pitchOrder < 3
+    missing_list = df_filtered[condition2][condition3].processID
+    df_filtered = df[~(df['processID'].isin(missing_list))]
 
     return df_filtered
 
