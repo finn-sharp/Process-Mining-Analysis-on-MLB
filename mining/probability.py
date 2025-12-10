@@ -4,6 +4,7 @@
 from pm4py.objects.log.util import dataframe_utils
 from pm4py.objects.conversion.log import converter as log_converter
 from pm4py.objects.log.obj import EventLog, Trace
+from pm4py.util import constants
 
 from pm4py.algo.filtering.log.variants.variants_filter import get_variants
 from collections import defaultdict
@@ -22,13 +23,7 @@ def prepare_eventLog(df_clean):
     """
     # 필요한 컬럼만 선택
     df_clean = df_clean[['case:concept:name', 'concept:name', 'time:timestamp']].copy()
-    
-    # # None, 빈 문자열, NaN 모두 제거
-    # df_clean = df_clean.dropna(subset=['concept:name'])
-    # df_clean = df_clean[df_clean['concept:name'].notna()]
-    # df_clean = df_clean[df_clean['concept:name'] != '']
-    # df_clean = df_clean[df_clean['concept:name'].astype(str) != 'nan']
-    # df_clean['concept:name'] = df_clean['concept:name'].astype(str)
+
     
     return df_clean
 
@@ -81,12 +76,14 @@ def create_eventlog_from_dataFrame(df_clean):
         EventLog: PM4Py 이벤트 로그
     """
 
-    # Timestamp 변환 & 이벤트 로그 변환
+
     df_clean = dataframe_utils.convert_timestamp_columns_in_df(df_clean)
-    event_log = log_converter.apply(df_clean)
+    event_log = log_converter.apply(df_clean,
+        parameters={log_converter.Variants.TO_EVENT_LOG.value.Parameters.CASE_ID_KEY: "case:concept:name"},
+        variant=log_converter.Variants.TO_EVENT_LOG)
     
     # None 값 제거
-    event_log = clean_event_log(event_log)
+    # event_log = clean_event_log(event_log)
     
     return event_log
 

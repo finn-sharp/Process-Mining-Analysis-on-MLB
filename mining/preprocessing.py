@@ -14,7 +14,6 @@ def deleteNullPitchType(df_event):
     condition = ~df_event['processID'].isin(p_index)
     
     df_event = df_event[condition]
-    # df_event = df_event.sort_values(by=['processID'], ascending=True).reset_index(drop=True)
     return df_event
 
 def checkNullPitchType(df_event):
@@ -135,7 +134,7 @@ def add_node_and_preprocess(df_event, start_name, end_name, case_type=None):
     # [4] 결과 저장
     node_df = pd.DataFrame(add_node_list)
     acept_data = pd.concat([acept_data, node_df], ignore_index=True)
-    acept_data = acept_data.sort_values(by=['processID', 'pitchOrder'], ascending=[True, True]).reset_index(drop=True)
+    acept_data = acept_data.sort_values(by=['processID', 'pitchOrder'], ascending=[True, True])
 
     return acept_data
 
@@ -191,9 +190,7 @@ def define_at_bat_cases(df):
         DataFrame: case_id가 추가된 DataFrame
     """
     # 투구 순서 부여 + 케이스별로 정렬 + 그룹 인덱스 라벨링
-    df_event = df.copy()
-    df_event = df_event.reset_index()
-    
+    df_event = df.copy()    
     df_event['case_id'] = (df_event['game_date'].astype(str) + "_" + df_event['batter'].astype(str))
     df_event['processID'] = assign_group_index_two_pointer(df_event)
     df_event['pitchOrder'] = df_event.groupby('processID').cumcount()
@@ -201,8 +198,6 @@ def define_at_bat_cases(df):
     df_event = df_event[~(df_event['case_lengths'] < 3.0)]
     
     print(df_event.case_lengths.value_counts())
-
-    del df_event['index']
     del df_event['case_id']
 
     return df_event
