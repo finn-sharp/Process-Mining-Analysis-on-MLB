@@ -217,9 +217,10 @@ def one_way_filter(df, colName = 'events', posCondition = ['strikeout']):
 
     # 4. 구종 Counts가 3개 이상인 정상 데이터만 추출
     condition2 = df_filtered.pitch_type == 'end'
-    condition3 = df_filtered[condition2].pitchOrder < 3
-    missing_list = df_filtered[condition2][condition3].processID
-    df_filtered = df[~(df['processID'].isin(missing_list))]
+    condition3 = df_filtered[condition2].pitchOrder >= 3
+    missing_list = df_filtered[condition2 & condition3].processID
+
+    df_filtered = df[df['processID'].isin(missing_list)]
 
     return df_filtered
 
