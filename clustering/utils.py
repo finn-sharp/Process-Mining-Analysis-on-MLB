@@ -2,6 +2,7 @@ import pandas as pd
 
 def clustered_dataframe(final_results, df_filtered):
     
+    df_filtered = df_filtered.copy()
     cluster_map = final_results['cluster_map']
     mapping_to_cluster = {}
 

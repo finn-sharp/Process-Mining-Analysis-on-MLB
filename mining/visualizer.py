@@ -73,8 +73,8 @@ def sankey_visualizer(data, length):
     fig.update_layout(
         title_text=f"Multi-Layer State Transition ({length})",
         font_size=20,
-        width=800,
-        height=600
+        width=1000,
+        height=1000
     )
 
     fig.show()

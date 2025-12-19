@@ -84,8 +84,10 @@ def attach_case_result_to_pitch_type(df_event):
 def add_node_and_preprocess(df_event, start_name, end_name, case_type=None):
  
     # [1] 행 제거(PitchType is Null)
+    df_event = df_event.copy()
     acept_data = deleteNullPitchType(df_event)
-    
+    acept_data['game_date'] = pd.to_datetime(acept_data['game_date'])
+
     # [2] Description을 3개 범주로 그룹화
     # acept_data = descriptionToGroups(acept_data)
 
@@ -197,13 +199,14 @@ def define_at_bat_cases(df):
     df_event['case_lengths'] = df_event.groupby('processID')['events'].transform('size')
     df_event = df_event[~(df_event['case_lengths'] < 3.0)]
     
-    print(df_event.case_lengths.value_counts())
     del df_event['case_id']
 
     return df_event
 
 
 def one_way_filter(df, colName = 'events', posCondition = ['strikeout']):
+
+    df = df.copy()
 
     # 1. 조건에 걸리는 행만 추출
     condition1 = df[colName].isin(posCondition)
