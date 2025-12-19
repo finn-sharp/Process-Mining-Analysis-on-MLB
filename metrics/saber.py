@@ -39,8 +39,8 @@ def k_per_pa(df_filtered):
 
     results = []
     c = 'all'
-    pa = df_filtered["processID"].nunique()
-    strikeouts = (df_filtered["events"] == "strikeout").sum()       
+    pa = df_end["processID"].nunique()
+    strikeouts = (df_end["events"] == "strikeout").sum()
     kpa = strikeouts / pa
 
     results.append({
@@ -110,7 +110,7 @@ def fip(df_filtered, constant=3.1):
         (13 * cluster_stats["HR"]
          + 3 * (cluster_stats["BB"] + cluster_stats["HBP"])
          - 2 * cluster_stats["K"]) / cluster_stats["IP"]
-        + constant
+         + constant
     )
 
     return cluster_stats
