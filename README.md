@@ -104,8 +104,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 <br>
-또는 의존성 패키지 및 실제 본 Repository를 활용하여 데이터를 분석하기 위해서 아래 코드를 실행해도 됩니다.
+또는 의존성 패키지 및 실제 본 Repository를 활용하여 데이터를 분석하기 위해서 아래 코드를 실행해도 됩니다.  
 하지만 데이터 등을 활용하는 측면에서 가급적 clone 후 package를 활용하면 좋을 것 같습니다.
+
 ```Bash
 pip install git+https://github.com/finn-sharp/Process-Mining-Analysis-on-MLB.git
 pip install -r requirements.txt
