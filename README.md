@@ -33,7 +33,12 @@
 │   ├── visualizer.py         # - MDS, Dendrogram 시각화 기능
 │   └── utils.py              # - 군집화 이후 cluster를 ProcessID를 기반으로 dataframe에 mapping하는 함수
 ├── lib/                      # [3] 라이브러리 및 공통 데이터 저장소 (Common Libs/Data)
-├── mining/                   # [4] 프로세스 마이닝 분석 모듈 (Core Logic)
+├── data/                     # [4] 프로세스 마이닝 분석에 필요한 데이터( 2019 ~ 2024년도 투수의 투구 데이터)
+│   └── pitcher_2019_2024.csv   # 분석에 사용한 실제 데이터셋
+├── metrics/                  # [5] 프로세스 마이닝 분석에 필요한 데이터( 2019 ~ 2024년도 투수의 투구 데이터)
+│   ├── __init__.py              
+│   └── saber.py              # Sabermetrics에 사용하는 지표 함수 정의(p/pa, k/pa, fip)
+├── mining/                   # [6] 프로세스 마이닝 분석 모듈 (Core Logic)
 │   ├── __init__.py
 │   ├── utils.py              # - load_data_from_bigquery 등 유틸리티 함수
 │   ├── preprocessing.py      # - 전처리, 필터링, 노드 추가 함수
@@ -45,7 +50,7 @@
 ├── key.json                  # BigQuery 접근 인증 파일
 ├── README.md
 ├── requirements.txt          # 패키지 의존성 목록
-└── inference.ipynb           # [5] 메인 실험 및 분석 노트북
+└── inference.ipynb           # [7] 메인 실험 및 분석 노트북
 ```
 <br>
 
@@ -56,8 +61,10 @@
 | **[1]** | **`cap`** (`venv`) | **가상 환경:** 프로젝트의 Python 인터프리터와 설치된 의존성 패키지(`pm4py`, `pandas`, `Levenshtein` 등)를 격리 보관합니다. |
 | **[2]** | **`clustering`** | **군집화 모듈:** 구종 시퀀스 간의 **구조적 유사성(Levenshtein Distance)**을 계산하고, 이를 기반으로 **계층적 군집화 및 MDS 시각화**를 수행하는 모듈이 포함됩니다. |
 | **[3]** | **`lib`** | **공용 자원:** 프로젝트 전반에 걸쳐 사용되는 재사용 가능한 라이브러리 파일이나 공통 데이터셋을 저장합니다. |
-| **[4]** | **`mining`** | **프로세스 마이닝 핵심 로직:** 데이터 로드, **프로세스 이벤트 로그 변환**, EDA, **전이 확률 계산** 등 프로세스 마이닝을 위한 기본 분석 기능이 정의되어 있습니다. |
-| **[5]** | **`inference.ipynb`** | **실험 코드:** 데이터를 로드하고 전처리한 후, `mining` 모듈로 EDA를 수행하고 `clustering` 모듈로 패턴 분류를 수행하는 **전체 연구 흐름이 순서대로 기록**된 메인 노트북입니다. |
+| **[4]** | **`data`** | **수집 데이터:** 실제 Process Mining을 통한 Sabermetrics 개선 연구에 활용한 데이터셋을 저장합니다. |
+| **[5]** | **`metrics`** | **평가 지표:** 군집화된 데이터 별 Sabermetrics을 평가하기위해 실제 공식에 기반하여 계산하기 위한 지표 함수를 정의했습니다. |
+| **[6]** | **`mining`** | **프로세스 마이닝 핵심 로직:** 데이터 로드, **프로세스 이벤트 로그 변환**, EDA, **전이 확률 계산** 등 프로세스 마이닝을 위한 기본 분석 기능이 정의되어 있습니다. |
+| **[7]** | **`inference.ipynb`** | **실험 코드:** 데이터를 로드하고 전처리한 후, `mining` 모듈로 EDA를 수행하고 `clustering` 모듈로 패턴 분류를 수행하는 **전체 연구 흐름이 순서대로 기록**된 메인 노트북입니다. |
 <br>
 
 ## **4. 초기 환경 설정 (Quick Start)**
@@ -93,13 +100,18 @@ source venv/bin/activate
 
 프로젝트에 필요한 모든 라이브러리를 `requirements.txt` 파일을 통해 설치합니다.
 
-
 ```Bash
 pip install -r requirements.txt
 ```
 <br>
+또는 의존성 패키지 및 실제 본 Repository를 활용하여 데이터를 분석하기 위해서 아래 코드를 실행해도 됩니다.
+하지만 데이터 등을 활용하는 측면에서 가급적 clone 후 package를 활용하면 좋을 것 같습니다.
+```Bash
+pip install git+https://github.com/finn-sharp/Process-Mining-Analysis-on-MLB.git
+pip install -r requirements.txt
+```
 
 ### **4.3. 데이터 접근 설정**
 
 Google Cloud BigQuery를 사용하므로, 프로젝트 루트 디렉토리에 **`key.json`** 파일을 배치하여 데이터베이스 접근 권한을 설정해야 합니다.
-
+또는 실제 data 폴더에 저장된 csv파일을 활용하여 마무리 투수에 대한 연구를 진행합니다.
