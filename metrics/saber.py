@@ -5,7 +5,7 @@ def p_per_pa(df_filtered):
 
     c = 'all'
     pitches = len(df_filtered)
-    pa = df_filtered['ProcessID'].nunique()
+    pa = df_filtered['processID'].nunique()
     p_pa = pitches/pa
     
     results.append({
@@ -15,7 +15,7 @@ def p_per_pa(df_filtered):
                 "P/PA": p_pa
             })
 
-    if ('unit' in df_filtered.columns):
+    if ('cluster' in df_filtered.columns):
         for c, group in df_filtered.groupby("cluster"):
             pitches = len(group)                     # 총 투구 수(P)
             pa = group["processID"].nunique()        # 고유 타석 수(PA)
@@ -28,7 +28,7 @@ def p_per_pa(df_filtered):
                 "P/PA": p_pa
             })
 
-    df_result = pd.DataFrame(results).sort_values("unit").reset_index(drop=True)
+    df_result = pd.DataFrame(results)
     p_pa_dict = {row["unit"]: row["P/PA"] for row in results}
     return p_pa_dict, df_result
 
@@ -64,36 +64,11 @@ def k_per_pa(df_filtered):
                 "K/PA": kpa
             })
 
-    df_result = pd.DataFrame(results).sort_values("cluster").reset_index(drop=True)
+    df_result = pd.DataFrame(results)
     kpa_dict = {row["cluster"]: row["K/PA"] for row in results}
     return kpa_dict, df_result
 
 
-# def fip(df_filtered, total_IP=60, constant=3.1):
-#     df_end = df_filtered[df_filtered["pitch_type"] == "end"]
-
-#     cluster_stats = (
-#         df_end.groupby("cluster")
-#         .agg(
-#             PA=("processID", "nunique"),
-#             K=("events", lambda x: (x == "strikeout").sum()),
-#             BB=("events", lambda x: (x == "walk").sum()),
-#             HBP=("events", lambda x: (x == "hit_by_pitch").sum()),
-#             HR=("events", lambda x: (x == "home_run").sum())
-#         )
-#     )
-#     IP_criteria = ["strikeout", "field_out", "force_out", "grounded_into_double_play", "double_play", "sac_fly", "sac_bunt"]
-#     cluster_stats["IP"] = (cluster_stats["PA"] / total_PA) * total_IP
-#     total_PA = df_end["processID"].nunique()
-
-#     cluster_stats["FIP"] = (
-#         (13 * cluster_stats["HR"] +
-#          3 * (cluster_stats["BB"] + cluster_stats["HBP"]) -
-#          2 * cluster_stats["K"]) / cluster_stats["IP"]
-#         + constant
-#     )
-    
-#     return cluster_stats
 
 def fip(df_filtered, constant=3.1):
 

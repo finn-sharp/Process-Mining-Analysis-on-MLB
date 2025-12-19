@@ -46,11 +46,8 @@ def one_step_EDA_from_bigquery(path="key.json", limit=None, start_name='start', 
     # Data Preprocess
     df_preprocess = preprocessing_df(df, start_name=start_name, end_name=end_name, case_type=case_type)
 
-    # Data Filtering
-    df_filtered = one_way_filter(df_preprocess, 'events', ['strikeout'])
-
     # Event Log 데이터를 Probability로 계산
-    calc_eventlog = BasedTraces(df_filtered) 
+    calc_eventlog = BasedTraces(df_preprocess) 
     final_result = calc_eventlog()
 
     # Probability Based EDA : 기술통계량 및 시각화
@@ -77,11 +74,8 @@ def one_step_EDA_from_csv(path:str, limit=None, start_name='start', end_name='en
     # Data Preprocess
     df_preprocess = preprocessing_df(df, start_name=start_name, end_name=end_name, case_type=case_type)
 
-    # Data Filtering
-    df_filtered = one_way_filter(df_preprocess, 'events', ['strikeout'])
-
     # Event Log 데이터를 Probability로 계산
-    calc_eventlog = BasedTraces(df_filtered) 
+    calc_eventlog = BasedTraces(df_preprocess) 
     final_result = calc_eventlog()
 
     # Probability Based EDA : 기술통계량 및 시각화

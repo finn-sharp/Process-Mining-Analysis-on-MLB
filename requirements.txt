@@ -32,3 +32,4 @@ RapidFuzz==3.14.3
 # [5] 기타
 tqdm==4.67.1
 lxml==6.0.2
+setuptools
