@@ -8,11 +8,10 @@
 
 ## **2. 프로젝트 참여자 (Contributors)**
 
-| **사진 이름 (Photo Filename)** | **역할 (Role)** | **담당자 (Name)** |
+| **김재현** | **위훈성** | **김상훈** |
 | --- | --- | --- |
-| **[파일 이름 명시]** | **프로젝트 리드 및 기획** (Project Lead & Planning), **시각화 및 결과 해석** (Visualization & Interpretation) | (담당자 이름 명시) |
-| **[파일 이름 명시]** | **데이터 엔지니어링 및 전처리** (Data Engineering & Preprocessing) | (담당자 이름 명시) |
-| **[파일 이름 명시]** | **군집 분석 및 알고리즘 구현** (Clustering Analysis & Algorithm Implementation) | (담당자 이름 명시) |
+|<img width="295" height="413" alt="image" src="https://github.com/user-attachments/assets/e3dc25ec-4919-418b-996f-8e90964b179f" />| <img width="295" height="413" alt="image" src="https://github.com/user-attachments/assets/66a1e01e-b57b-4b03-b3fb-09e4ef38f4da" />|<img width="295" height="413" alt="image" src="https://github.com/user-attachments/assets/29f62315-fb55-4d5f-988f-bcd03c98f171" />|
+|• Pipeline & Template <br>• Data Visualization <br>• Data Preprocessing <br>• Mudulization <br>• Final Presentation|• Project Leading <br>• Midterm Presentation <br>• Literature Analysis <br>• Sabermetrics Module <br>• Write Research Report|• Data Screping <br> • Research Planning <br> • Final Presentation <br> • Midterm Deck making<br> •  Final Deck making
 <br>
 
 ### 2.1 프로젝트 초기 설정 및 환경 세팅 가이드
