@@ -11,8 +11,8 @@
 | **팀원** | **역할** |
 | --- | --- |
 |<img height="135" alt="image" src="https://github.com/user-attachments/assets/e3dc25ec-4919-418b-996f-8e90964b179f" /> <br> <p align="center">[김재현]</p>|• 데이터 분석 파이프라인 및 코드 템플릿 구조를 설계하여 프로젝트 전반의 분석 흐름을 정리함 <br>• 분석 결과 해석을 돕기 위한 데이터 시각화 작업을 수행함 <br>• 원천 데이터 정제 및 가공 등 데이터 전처리 전반을 담당함 <br>• 코드의 재사용성과 유지보수성을 고려한 모듈화 작업을 수행함 <br>• 프로젝트 결과를 종합하여 최종 발표 자료를 구성하고 발표를 진행함|
-|<img height="135" alt="image" src="https://github.com/user-attachments/assets/66a1e01e-b57b-4b03-b3fb-09e4ef38f4da" /> <br> <p align="center">[위훈성]</p>|• 프로젝트 전체 기획과 진행을 총괄하며 연구 방향과 일정을 관리함 <br>• 중간 발표를 기획·진행하며 연구 진행 상황을 공유함 <br>• 선행 연구 및 관련 논문 분석을 통해 연구의 이론적 기반을 정리함 <br>• 세이버메트릭스 지표 계산을 위한 분석 모듈을 설계·구현함 <br>• 분석 결과를 정리하여 연구 보고서를 작성함|
-|<img height="135" alt="image" src="https://github.com/user-attachments/assets/29f62315-fb55-4d5f-988f-bcd03c98f171" /> <br> <p align="center">[김상훈]</p>|• 분석에 필요한 데이터를 수집하고 웹 스크래핑을 통해 원천 데이터를 확보함 <br>• 연구 주제 설정 및 분석 방향 수립 등 연구 기획 단계에 참여함 <br>• 중간 발표 및 최종 발표용 발표 자료(데크)를 제작함 <br>• 최종 발표 과정에 참여하여 프로젝트 결과 공유를 지원함|
+|<img height="135" alt="image" src="https://github.com/user-attachments/assets/66a1e01e-b57b-4b03-b3fb-09e4ef38f4da" /> <br> <p align="center">[위훈성]</p>|• 프로젝트 전체 기획을 총괄하며 연구 방향을 관리함 <br>• 중간 발표를 기획·진행하며 연구 진행 상황을 공유함 <br>• 선행 연구 및 관련 논문 분석을 통해 연구의 이론적 기반을 정리함 <br>• 세이버메트릭스 지표 계산을 위한 분석 모듈을 설계·구현함 <br>• 분석 결과를 정리하여 연구 보고서를 작성함|
+|<img height="135" alt="image" src="https://github.com/user-attachments/assets/29f62315-fb55-4d5f-988f-bcd03c98f171" /> <br> <p align="center">[김상훈]</p>|• 프로젝트 전체 진행을 총괄하며 일정을 관리함 <br>• 분석에 필요한 데이터를 수집하고 웹 스크래핑을 통해 원천 데이터를 확보함 <br>• 연구 주제 설정 및 분석 방향 수립 등 연구 기획 단계에 참여함 <br>• 중간 발표 및 최종 발표용 발표 자료(데크)를 제작함 <br>• 최종 발표 과정에 참여하여 프로젝트 결과 공유를 지원함|
 <br>
 
 ### 2.1 프로젝트 초기 설정 및 환경 세팅 가이드
